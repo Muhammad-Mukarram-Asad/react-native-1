@@ -9,23 +9,42 @@ import {
   ScrollView,
   TouchableOpacity
 } from "react-native";
-import App from "./App";
 
 export default function Todo() {
   const [text, setText] = useState("");
   const [list, setList] = useState([]);
+  const [editMode, setEditMode] = useState(false);
+  const[editIndex, setEditIndex] = useState("");
 
   function addItem() {
     let temp_list = [...list];
     temp_list.push(text);
     setList(temp_list);
     // After adding an element, empty the input.
-    // setText("");
+    setText("");
   }
   function deleteItem(index) {
     let templist = [...list];
     templist.splice(index, 1);
     setList(templist);
+  }
+
+  function editItem(index)
+  {
+    let target_item = list[index];
+    setText(target_item);
+    setEditMode(true);
+    setEditIndex(index);
+  }
+
+  function updateItem()
+  {
+    setEditMode(false);
+    setText("");
+    const tempList = [...list];
+    tempList[editIndex] = text;
+    setList(tempList);
+
   }
 //   function onInputChange(e) {
 //     setText(e.target.value);
@@ -37,6 +56,12 @@ export default function Todo() {
   // In order to make custom buttons in react-native:
 
   const AppButton = ({ onPress, title }) => (
+    <TouchableOpacity onPress={onPress} style={styles.appButtonContainer}>
+      <Text style={styles.appButtonText}>{title}</Text>
+    </TouchableOpacity>
+  );
+
+  const UpdateButton = ({ onPress, title }) => (
     <TouchableOpacity onPress={onPress} style={styles.appButtonContainer}>
       <Text style={styles.appButtonText}>{title}</Text>
     </TouchableOpacity>
@@ -57,9 +82,11 @@ export default function Todo() {
         value={text}
         onChangeText={newText => setText(newText)}
         style={styles.input1}
-      />
+        />
+      {editMode ? <UpdateButton /> : <AppButton /> }
       <AppButton onPress={addItem} title={"Add Element"} />
-      {/* <Button style={styles.btn} onPress={addItem} title="Add Item" /> */}
+      <UpdateButton onPress={updateItem} title= {"Update Element"} />
+
 
       <ScrollView>
         {list.map((item, index) => {
